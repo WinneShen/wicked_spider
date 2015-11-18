@@ -48,9 +48,9 @@ class DBmanager:
             print 'has not connet'
             
     def inserttableinfo_byparams(self,table,select_params,insert_values):
+        result=0
         if len(insert_values)<1 :
             print 'no insert values'
-            return
         elif  self.__isconnect:            
             try:
                 sql='replace into '+table
@@ -64,14 +64,52 @@ class DBmanager:
                     sql=sql+' values('    
                     for j in range(0,length-1):
                         sql=sql+'%s'+','    
-                    sql=sql+'%s'+')'            
-                else:
-                    return
-                print sql
-                result=self.__cur.executemany(sql,insert_values)
-                print 'result is '+str(result)
-                self.__conn.commit()
+                    sql=sql+'%s'+')'
+                    result=self.__cur.executemany(sql,insert_values)
+                    self.__conn.commit()
             except MySQLdb.Error,e:
                 print "Mysql Error %d: %s" % (e.args[0], e.args[1])
         else:
             print 'has not connet'
+        return result
+    
+    def  searchtableinfo_byparams(self,table=[],select_params=[],request_params=[],equal_params=[]):
+        if len(request_params)!=len(equal_params):
+            print 'length of request_params,equals_params not match'
+            return
+        elif  self.__isconnect==True:
+            try:
+                sql='select     '
+                length=len(select_params)
+                if length > 0:
+                    for j in range(0,length-1):
+                        sql=sql+select_params[j]+','
+                    sql=sql+select_params[length-1]
+                else:
+                    sql=sql+'*'
+                sql=sql+' from '
+                length=len(table)
+                for j in range(0,length-1):
+                    sql=sql+table[j]+','
+                sql=sql+table[length-1]
+                request_params_length=len(request_params)
+                if request_params_length>0:
+                    sql=sql+' where '
+                    for k in range(0,request_params_length-1):
+                        sql=sql+request_params[k]+' = '+equal_params[k]+' and '
+                    sql=sql+request_params[request_params_length-1]+' = '+equal_params[request_params_length-1]+'  '
+                print sql
+                count=self.__cur.execute(sql)
+                if count>0:
+                    result=self.__cur.fetchall()
+                    content=self.__cur.description
+                    col= len(content)
+                    print result,content,count,col
+                    return result,content,count,col
+                else:
+                    print '没有相关信息'
+                    return (0,0,0,0)
+            except MySQLdb.Error,e:
+                print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+        else:
+            print 'has not connet' 

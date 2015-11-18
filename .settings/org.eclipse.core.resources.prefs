@@ -1,3 +1,5 @@
 eclipse.preferences.version=1
 encoding//src/scripts/citiesparser.py=utf-8
 encoding//src/scripts/sqltool.py=utf-8
+encoding//src/scripts/ticketinfo.py=utf-8
+encoding//src/ticketspider.py=utf-8

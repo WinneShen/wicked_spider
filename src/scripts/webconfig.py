@@ -5,4 +5,6 @@ Created on 2015-11-18
 '''
 class WebConfig(object):
     station_url='https://kyfw.12306.cn/otn/resources/js/framework/station_name.js?station_version=1.8820'
+    query_url='https://kyfw.12306.cn/otn/leftTicket/query'
+    queryTicketPrice_url='https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice'
     

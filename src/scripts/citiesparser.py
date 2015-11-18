@@ -37,6 +37,9 @@ class CitiesParser():
     
     #存入本地数据库中
     def save_station_table(self):
+        '''
+        @return: 执行行数
+        '''
         station_list=self.__parse_city()
         insert_values=[]
         for s in station_list:
@@ -45,8 +48,9 @@ class CitiesParser():
         SQL_tool.connectdb()
         result=SQL_tool.inserttableinfo_byparams('stationinfo', ["id","code","name","quanpin","abbreviate"], insert_values)
         SQL_tool.closedb()
-        print result 
+        return result 
 
 if __name__ == "__main__":   
-     CitiesParser().save_station_table()
+    result=CitiesParser().save_station_table()
+    print result
      
