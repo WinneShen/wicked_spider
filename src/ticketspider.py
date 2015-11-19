@@ -32,28 +32,33 @@ class TicketSpider():
         for i in range(len(list(station_codes))):
             for j in range(len(list(station_codes))):
                 ticket_info = TicketInfo(tuple2str(station_codes[i]), tuple2str(station_codes[j]), '2015-11-25')
-                req = urllib2.Request(url=self.__query_url + '?' + \
+                url=self.__query_url + '?' + \
                                       ticket_info.head + '.train_date=' + ticket_info.train_date + '&' + \
                                       ticket_info.head + '.from_station=' + ticket_info.from_station + '&' + \
                                       ticket_info.head + '.to_station=' + ticket_info.to_station + \
-                                      '&purpose_codes=ADULT')                
-                resp = urllib2.urlopen(req)        
+                                      '&purpose_codes=ADULT'
+                print url
+                req = urllib2.Request(url=url,headers=WEBCONFIG.headers)                
+                resp = urllib2.urlopen(req) 
+                print resp.read()       
                 data = json.load(resp)  # 读出内容
+                print data
                 if data['httpstatus'] == 200:
                     if len(data['data']) > 0:
                         for a_ticket in data['data']:
-                            ticket_info.set_train_info(a_ticket['queryLeftNewDTO']['train_no'], \
-                                                       a_ticket['queryLeftNewDTO']['station_train_code'], \
-                                                       a_ticket['queryLeftNewDTO']['from_station_no'], \
-                                                       a_ticket['queryLeftNewDTO']['to_station_no'], \
-                                                       a_ticket['queryLeftNewDTO']['start_time'], \
-                                                       a_ticket['queryLeftNewDTO']['arrive_time'], \
-                                                       int(a_ticket['queryLeftNewDTO']['lishiValue']), \
-                                                       a_ticket['queryLeftNewDTO']['seat_types'], \
-                                                       a_ticket['queryLeftNewDTO']['station_train_code'][0])
-                            price_dict = self.__get_ticket_price(ticket_info.train_no, ticket_info.from_station_no, \
-                                                               ticket_info.to_station_no, ticket_info.seat_types, ticket_info.train_date)
-                            ticket_info.set_ticket_price(price_dict['price_A9'], price_dict['price_P'], price_dict['price_M'], price_dict['price_O'], price_dict['price_A6'], price_dict['price_A4'], price_dict['price_A3'], price_dict['price_A2'], price_dict['price_A1'], price_dict['price_WZ'])                            
+                            if a_ticket['queryLeftNewDTO']['controlled_train_flag']=='0':
+                                ticket_info.set_train_info(a_ticket['queryLeftNewDTO']['train_no'], \
+                                                           a_ticket['queryLeftNewDTO']['station_train_code'], \
+                                                           a_ticket['queryLeftNewDTO']['from_station_no'], \
+                                                           a_ticket['queryLeftNewDTO']['to_station_no'], \
+                                                           a_ticket['queryLeftNewDTO']['start_time'], \
+                                                           a_ticket['queryLeftNewDTO']['arrive_time'], \
+                                                           int(a_ticket['queryLeftNewDTO']['lishiValue']), \
+                                                           a_ticket['queryLeftNewDTO']['seat_types'], \
+                                                           a_ticket['queryLeftNewDTO']['station_train_code'][0])
+                                price_dict = self.__get_ticket_price(ticket_info.train_no, ticket_info.from_station_no, \
+                                                                   ticket_info.to_station_no, ticket_info.seat_types, ticket_info.train_date)
+                                ticket_info.set_ticket_price(price_dict['price_A9'], price_dict['price_P'], price_dict['price_M'], price_dict['price_O'], price_dict['price_A6'], price_dict['price_A4'], price_dict['price_A3'], price_dict['price_A2'], price_dict['price_A1'], price_dict['price_WZ'])                            
                 else:
                     print data['httpstatus']
                     exit(1)
@@ -66,13 +71,16 @@ class TicketSpider():
         print train_no, from_station_no, to_station_no, seat_types, train_date
         price_dict = {'price_A9':None, 'price_P':None, 'price_M':None, 'price_O':None, 'price_A6':None, \
                     'price_A4':None, 'price_A3':None, 'price_A2':None, 'price_A1':None, 'price_WZ':None}
-        req = urllib2.Request(url=self.__queryTicketPrice_url + '?' + \
+        url=self.__queryTicketPrice_url + '?' + \
                             'train_no=' + train_no + '&' + \
                             'from_station_no=' + from_station_no + '&' + \
                             'to_station_no=' + to_station_no + '&' + \
                             'seat_types=' + seat_types + '&' + \
-                            'train_date=' + train_date)                
-        resp = urllib2.urlopen(req)        
+                            'train_date=' + train_date
+        print url
+        req = urllib2.Request(url=url,headers=WEBCONFIG.headers)                
+        resp = urllib2.urlopen(req)    
+        print resp.read()    
         data = json.load(resp)
         if data['httpstatus'] == 200:
             for key, value in data['data'].items():
@@ -106,7 +114,8 @@ class TicketSpider():
     # 存入本地数据库
     
 def tuple2str(s):
-    return "".join(tuple(s))      
+    return "".join(tuple(s)) 
+    
 if __name__ == "__main__":   
     TicketSpider().get_tickets_info()
     
