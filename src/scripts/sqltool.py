@@ -104,7 +104,6 @@ class DBmanager:
                     result=self.__cur.fetchall()
                     content=self.__cur.description
                     col= len(content)
-                    print result,content,count,col
                     return result,content,count,col
                 else:
                     print '没有相关信息'

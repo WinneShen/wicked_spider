@@ -10,3 +10,4 @@ class StationInfo(object):
         self.code = code
         self.quanpin = quanpin
         self.id = id
+        
